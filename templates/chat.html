@@ -3,9 +3,58 @@
     <head>
         <title>Chat</title>
     </head>
+    <style type="text/css">
+        input {
+            display: block;
+        }
+        ul {
+            list-style: none;
+        }
+    </style>
     
     <body>
-        Let's chat (from template)!
+        <ul id="messages"></ul>
+        <form id="chatbox">
+            <textarea cols="30" rows="10"></textarea>
+            <input type="submit" value="Send">
+        </form>
+        <script>
+            let socket = null;
+            const msgBox = document.querySelector("#chatbox textarea");
+            const messages = document.querySelector("#messages")
+            const formChat = document.querySelector("#chatbox")
+            let li;
+            formChat.addEventListener("submit", (e) => {
+                e.preventDefault();
+                if (!msgBox.value) return false;
+                
+                if (!socket) {
+                    alert("Error: There is no socket connection.");
+                    return false;
+                }
+                socket.send(msgBox.value)
+                msgBox.value = "";
+                return false;
+            });
+            
+            if (!window["WebSocket"]) {
+                alert("Error: Your browser does not support web sockets.")
+            } else {
+                socket = new WebSocket("wss://{{.Host}}/room")
+                socket.addEventListener('open', function (event) {
+                    console.log("Conexão aberta");
+                });
+                socket.onclose = () => alert("Connection has been closed.");
+            }
+            
+            socket.onmessage = e => {
+                li = document.createElement("li")
+                li.textContent = e.data;
+                messages.appendChild(li);
+                
+            }
+            
+        </script>
     </body>
 
 </html>

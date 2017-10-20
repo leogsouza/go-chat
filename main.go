@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/leogsouza/go-chat/defaultport"
 	"log"
 	"net/http"
@@ -21,17 +22,25 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.once.Do(func() {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
-	t.templ.Execute(w, nil)
+	t.templ.Execute(w, r)
 }
 
 func main() {
 
 	port := utils.DefaultPort()
+	var addr = flag.String("addr", ":"+port, "The addr of the application.")
+	flag.Parse() // parse the flags
+	r := newRoom()
 
 	http.Handle("/", &templateHandler{filename: "chat.html"})
+	http.Handle("/room", r)
+
+	// get the room going
+	go r.run()
 
 	// start the web server
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	log.Println("Starting web server on", *addr)
+	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
 }
