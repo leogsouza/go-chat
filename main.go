@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"github.com/leogsouza/go-chat/defaultport"
+	"github.com/leogsouza/trace"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sync"
 	"text/template"
@@ -31,7 +33,7 @@ func main() {
 	var addr = flag.String("addr", ":"+port, "The addr of the application.")
 	flag.Parse() // parse the flags
 	r := newRoom()
-
+	r.tracer = trace.New(os.Stdout)
 	http.Handle("/", &templateHandler{filename: "chat.html"})
 	http.Handle("/room", r)
 
