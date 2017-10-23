@@ -4,12 +4,12 @@ import (
 	"flag"
 	"github.com/leogsouza/go-chat/defaultport"
 	"github.com/leogsouza/trace"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
-	"text/template"
 )
 
 // templ represents a single template
@@ -34,7 +34,8 @@ func main() {
 	flag.Parse() // parse the flags
 	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
-	http.Handle("/", &templateHandler{filename: "chat.html"})
+	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
+	http.Handle("/login", &templateHandler{filename: "login.html"})
 	http.Handle("/room", r)
 
 	// get the room going
