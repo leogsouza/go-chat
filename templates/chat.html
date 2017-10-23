@@ -15,6 +15,7 @@
     <body>
         <ul id="messages"></ul>
         <form id="chatbox">
+            {{.UserData.name}}:<br>
             <textarea cols="30" rows="10"></textarea>
             <input type="submit" value="Send">
         </form>
@@ -32,7 +33,7 @@
                     alert("Error: There is no socket connection.");
                     return false;
                 }
-                socket.send(msgBox.value)
+                socket.send(JSON.stringify({"Message": msgBox.value}))
                 msgBox.value = "";
                 return false;
             });
@@ -48,8 +49,16 @@
             }
             
             socket.onmessage = e => {
-                li = document.createElement("li")
-                li.textContent = e.data;
+                var msg = eval("("+e.data+")");
+                console.log(JSON.parse(e.data))
+                li = document.createElement("li");
+                var strong = document.createElement("strong");
+                strong.textContent = `${msg.Name}: `;
+                var span = document.createElement("span")
+                span.textContent = msg.Message
+                
+                li.appendChild(strong);
+                li.appendChild(span);
                 messages.appendChild(li);
                 
             }
