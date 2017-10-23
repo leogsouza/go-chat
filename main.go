@@ -4,6 +4,10 @@ import (
 	"flag"
 	"github.com/leogsouza/go-chat/defaultport"
 	"github.com/leogsouza/trace"
+	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/facebook"
+	"github.com/stretchr/gomniauth/providers/github"
+	"github.com/stretchr/gomniauth/providers/google"
 	"html/template"
 	"log"
 	"net/http"
@@ -32,10 +36,20 @@ func main() {
 	port := utils.DefaultPort()
 	var addr = flag.String("addr", ":"+port, "The addr of the application.")
 	flag.Parse() // parse the flags
+
+	// set up gomniauth
+	gomniauth.SetSecurityKey("I was born to win!")
+	gomniauth.WithProviders(
+		facebook.New("key", "secret", "https://go-chat-leogsouza.c9users.io/auth/callback/facebook"),
+		google.New("927100418429-9bssnoqr5f94483d7ei6mp6vhuiirrgv.apps.googleusercontent.com", "O5ndCaPaCwobNcPeE-HoR6O8", "https://go-chat-leogsouza.c9users.io/auth/callback/google"),
+		github.New("key", "secret", "https://go-chat-leogsouza.c9users.io/auth/callback/github"),
+	)
+
 	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/room", r)
 
 	// get the room going
