@@ -36,6 +36,7 @@
                 
             </form>
         </div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
         <script>
             let socket = null;
             const msgBox = document.querySelector("#chatbox textarea");
@@ -81,7 +82,7 @@
                 li.appendChild(img)
                 
                 const strong = document.createElement("strong");
-                strong.textContent = `${msg.Name}: `;
+                strong.textContent = `${msg.Name} sent ${moment().calendar(msg.When)}: `;
                 
                 const span = document.createElement("span")
                 span.textContent = msg.Message
