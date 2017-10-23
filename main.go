@@ -52,7 +52,7 @@ func main() {
 		github.New("key", "secret", "https://go-chat-leogsouza.c9users.io/auth/callback/github"),
 	)
 
-	r := newRoom()
+	r := newRoom(UseAuthAvatar)
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
