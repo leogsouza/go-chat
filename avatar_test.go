@@ -31,7 +31,7 @@ func TestGravatarAvatar(t *testing.T) {
 	if err != nil {
 		t.Error("GravatarAvatar.GetAvatarURL should not return an error")
 	}
-	if url != "https://www.gravatar.com/0941bcf33e12cb871c4af395d50a5086" {
+	if url != "https://www.gravatar.com/avatar/0941bcf33e12cb871c4af395d50a5086" {
 		t.Errorf("GravatarAvatar.GetAvatarURL wrongly returnd %s", url)
 	}
 }
