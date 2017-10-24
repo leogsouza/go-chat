@@ -17,6 +17,13 @@ import (
 	"sync"
 )
 
+// set the active Avatar implementation
+var avatars Avatar = TryAvatars{
+	UseFileSystemAvatar,
+	UseAuthAvatar,
+	UseGravatar,
+}
+
 // templ represents a single template
 type templateHandler struct {
 	once     sync.Once
@@ -52,13 +59,17 @@ func main() {
 		github.New("key", "secret", "https://go-chat-leogsouza.c9users.io/auth/callback/github"),
 	)
 
-	r := newRoom(UseGravatar)
+	r := newRoom(UseFileSystemAvatar)
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.Handle("/upload", &templateHandler{filename: "upload.html"})
 	http.HandleFunc("/auth/", loginHandler)
 	http.HandleFunc("/logout/", logoutHandler)
+	http.HandleFunc("/uploader", uploaderHandler)
 	http.Handle("/room", r)
+
+	http.Handle("/avatars/", http.StripPrefix("/avatars/", http.FileServer(http.Dir("./avatars"))))
 
 	// get the room going
 	go r.run()
